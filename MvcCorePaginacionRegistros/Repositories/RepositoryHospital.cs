@@ -21,6 +21,7 @@ namespace MvcCorePaginacionRegistros.Repositories
             var consulta = from datos in this.context.Empleados
                            where datos.DeptNo==iddepartamento
                            select datos;
+            //return this.context.Empleados.Where(data => data.DeptNo == idDept).ToList();
             return consulta.ToList();
         }
 
