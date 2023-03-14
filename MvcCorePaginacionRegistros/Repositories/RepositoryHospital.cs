@@ -2,6 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using MvcCorePaginacionRegistros.Data;
 using MvcCorePaginacionRegistros.Models;
+using System.Data;
+using System.Diagnostics.Metrics;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace MvcCorePaginacionRegistros.Repositories
 {
@@ -12,16 +15,68 @@ namespace MvcCorePaginacionRegistros.Repositories
         //(@POSICION INT)
         //AS
         //    SELECT EMP_NO, APELLIDO, OFICIO, DIR, FECHA_ALT
-	       // , SALARIO, COMISION, DEPT_NO
+        // , SALARIO, COMISION, DEPT_NO
         //    FROM V_GRUPO_EMPLEADOS
         //    WHERE POSICION>= @POSICION AND POSICION<(@POSICION+5)
         //    ORDER BY APELLIDO
         //GO
+        //CREATE PROCEDURE SP_GRUPO_EMPLEADOS_OFICIO
+        //(@OFICIO NVARCHAR(20), @POSICION INT)
+        //AS
+        // SELECT EMP_NO, APELLIDO, OFICIO, DIR, FECHA_ALT
+        // , SALARIO, COMISION, DEPT_NO
+        // FROM(SELECT* FROM
+        // (SELECT CAST(
+        // ROW_NUMBER() OVER (ORDER BY APELLIDO) AS INT) AS POSICION,
+        // EMP_NO, APELLIDO, OFICIO, DIR, FECHA_ALT
+        // , SALARIO, COMISION, DEPT_NO
+        // FROM EMP
+        // WHERE OFICIO = @OFICIO) AS QUERY
+        // WHERE QUERY.POSICION>=@POSICION AND QUERY.POSICION<(@POSICION+3))
+        //    AS QUERY
+        // ORDER BY APELLIDO
+        //GO
+        //ALTER PROCEDURE SP_GRUPO_EMPLEADOS_OFICIO
+        //(
+        //  @OFICIO NVARCHAR(20), 
+        //  @POSICION INT,
+        //  @NUMREGISTROS INT OUTPUT
+        //)
+        //AS
+        //BEGIN
+        //   SELECT EMP_NO, APELLIDO, OFICIO, DIR, FECHA_ALT, SALARIO, COMISION, DEPT_NO
+        //   FROM(
+        //         SELECT* FROM
+        //         (
+        //           SELECT CAST(
+        //                  ROW_NUMBER() OVER (ORDER BY APELLIDO) AS INT) AS POSICION,
+        //                  EMP_NO, APELLIDO, OFICIO, DIR, FECHA_ALT, SALARIO, COMISION, DEPT_NO
+        //           FROM EMP
+        //           WHERE OFICIO = @OFICIO
+        //         ) AS QUERY
+        //         WHERE QUERY.POSICION>=@POSICION AND QUERY.POSICION<(@POSICION+3)
+        //        ) AS QUERY
+        //   ORDER BY APELLIDO
+        //   SET @NUMREGISTROS = @@ROWCOUNT
+        //END
+        //GO
+        //EXEC SP_GRUPO_EMPLEADOS_OFICIO 'VENDEDOR', 2, 3
         #endregion
         private HospitalContext context;
         public RepositoryHospital(HospitalContext context)
         {
             this.context = context;
+        }
+        public async Task<List<Empleado>> GetEmpleadosOficio(string oficio, int posicion)
+        {
+            string sql = "SP_GRUPO_EMPLEADOS_OFICIO @OFICIO @POSICION @NUMREGISTROS OUT";
+            SqlParameter pamoficio = new SqlParameter("@OFICIO", oficio);
+            SqlParameter pamposicion = new SqlParameter("@POSICION", posicion);
+            SqlParameter pamnumregistros = new SqlParameter("@NUMREGISTROS", SqlDbType.Int);
+            pamnumregistros.Direction = ParameterDirection.Output;
+            int numRegistros = (int)pamnumregistros.Value;
+            var consulta = this.context.Empleados.FromSqlRaw(sql, pamoficio, pamposicion, pamnumregistros);
+            return await consulta.ToListAsync();
         }
         public int GetNumeroRegistrosVistaDepartamentos()
         {

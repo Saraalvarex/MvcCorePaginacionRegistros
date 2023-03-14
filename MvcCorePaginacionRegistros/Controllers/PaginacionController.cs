@@ -16,6 +16,21 @@ namespace MvcCorePaginacionRegistros.Controllers
         {
             return View();
         }
+        public async Task<IActionResult> PaginarGrupoEmpleadosOficio()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PaginarGrupoEmpleadosOficio(string oficio, int? posicion)
+        {
+            if (posicion == null)
+            {
+                posicion = 1;
+            }
+            List<Empleado> empleados = await this.repo.GetEmpleadosOficio(oficio, posicion.Value);
+            return View(empleados);
+        }
         public async Task<IActionResult> PaginarGrupoEmpleados(int? posicion)
         {
             if (posicion == null)

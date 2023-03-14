@@ -1,0 +1,69 @@
+﻿@model List<Empleado>
+@{
+    ViewData["Title"] = "PaginarGrupoEmpleadosOficio";
+}
+@{
+    int numeroregistros = 3;
+    int numeropagina = 1;
+}
+@*FILTRO DE BÚSQUEDA POR OFICIO*@
+<div class="text-right form-inline">
+    <form method="post">
+        <div class="form-group">
+            <input type="text" name="oficio"/>
+        </div>
+        <button class="btn btn-primary">Buscar</button>
+    </form>
+</div>
+
+<h1 style="color: fuchsia">Paginar Grupo Empleados Oficio</h1>
+
+@if (Model!=null){
+<ul class="list-group list-group-horizontal">
+    @for (int i = 1; i <= numeroregistros; i += 3)
+    {
+        <li class="list-group-item list-group-item-primary">
+            <a asp-action="PaginarGrupoEmpleadosOficio"
+               asp-controller="Paginacion"
+               asp-route-posicion="@i">
+                @numeropagina
+            </a>
+        </li>
+        numeropagina += 1;
+    }
+</ul>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Numero empleado</th>
+            <th>Apellido</th>
+            <th>Oficio</th>
+            <th>Direccion</th>
+            <th>Fecha de alta</th>
+        </tr>
+    </thead>
+    @foreach (Empleado emp in Model)
+    {
+        <tbody>
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => emp.EmpNo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => emp.Apellido)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => emp.Oficio)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => emp.Dir)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => emp.FechaAlta)
+                </td>
+            </tr>
+        </tbody>
+    }
+</table>
+}
