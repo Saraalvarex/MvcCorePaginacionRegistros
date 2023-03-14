@@ -1,4 +1,5 @@
-﻿using MvcCorePaginacionRegistros.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using MvcCorePaginacionRegistros.Data;
 using MvcCorePaginacionRegistros.Models;
 
 namespace MvcCorePaginacionRegistros.Repositories
@@ -9,6 +10,16 @@ namespace MvcCorePaginacionRegistros.Repositories
         public RepositoryHospital(HospitalContext context)
         {
             this.context = context;
+        }
+        public int GetNumeroRegistrosVistaDepartamentos()
+        {
+            return this.context.VistaDepartamentos.Count();
+        }
+
+        public async Task <VistaDepartamento> GetVistaDepartamento(int posicion)
+        {
+            VistaDepartamento vista = await this.context.VistaDepartamentos.FirstOrDefaultAsync(x=>x.Posicion==posicion);
+            return vista;
         }
         public List<Departamento> GetDepartamentos()
         {
@@ -24,6 +35,5 @@ namespace MvcCorePaginacionRegistros.Repositories
             //return this.context.Empleados.Where(data => data.DeptNo == idDept).ToList();
             return consulta.ToList();
         }
-
     }
 }

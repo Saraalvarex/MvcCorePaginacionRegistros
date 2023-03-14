@@ -8,5 +8,6 @@ namespace MvcCorePaginacionRegistros.Data
         public HospitalContext(DbContextOptions<HospitalContext> options) : base(options) { }
         public DbSet<Empleado> Empleados { get; set; }
         public DbSet<Departamento> Departamentos { get; set; }
+        public DbSet<VistaDepartamento> VistaDepartamentos { get; set; }
     }
 }
