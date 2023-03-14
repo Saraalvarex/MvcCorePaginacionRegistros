@@ -8,12 +8,14 @@ namespace MvcCorePaginacionRegistros.Repositories
     public class RepositoryHospital
     {
         #region PROCEDURES
-        //CREATE PROCEDURE SP_GRUPO_DEPARTAMENTOS
+        //CREATE PROCEDURE SP_GRUPO_EMPLEADOS
         //(@POSICION INT)
         //AS
-        //    SELECT DEPT_NO, DNOMBRE, LOC
-        //    FROM V_DEPARTAMENTOS_INDIVIDUAL
-        //    WHERE POSICION>= @POSICION AND POSICION<(@POSICION+2)
+        //    SELECT EMP_NO, APELLIDO, OFICIO, DIR, FECHA_ALT
+	       // , SALARIO, COMISION, DEPT_NO
+        //    FROM V_GRUPO_EMPLEADOS
+        //    WHERE POSICION>= @POSICION AND POSICION<(@POSICION+5)
+        //    ORDER BY APELLIDO
         //GO
         #endregion
         private HospitalContext context;
@@ -24,6 +26,18 @@ namespace MvcCorePaginacionRegistros.Repositories
         public int GetNumeroRegistrosVistaDepartamentos()
         {
             return this.context.VistaDepartamentos.Count();
+        }
+        public int GetNumeroRegistrosEmpleados()
+        {
+            return this.context.Empleados.Count();
+        }
+
+        public async Task<List<Empleado>> GetGrupoEmpleadosAsync(int posicion)
+        {
+            string sql = "SP_GRUPO_EMPLEADOS @POSICION";
+            SqlParameter pamposicion = new SqlParameter("@POSICION", posicion);
+            var consulta = this.context.Empleados.FromSqlRaw(sql, pamposicion);
+            return await consulta.ToListAsync();
         }
         public async Task<List<Departamento>> GetGrupoDepartamentosAsync(int posicion)
         {

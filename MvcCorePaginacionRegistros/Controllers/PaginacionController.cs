@@ -16,6 +16,17 @@ namespace MvcCorePaginacionRegistros.Controllers
         {
             return View();
         }
+        public async Task<IActionResult> PaginarGrupoEmpleados(int? posicion)
+        {
+            if (posicion == null)
+            {
+                posicion = 1;
+            }
+            int numRegistros = this.repo.GetNumeroRegistrosEmpleados();
+            ViewBag.REGISTROS = numRegistros;
+            List<Empleado> empleados = await this.repo.GetGrupoEmpleadosAsync(posicion.Value);
+            return View(empleados);
+        }
 
         public async Task <IActionResult> PaginarGrupoDepartamentos(int? posicion)
         {
