@@ -1,6 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+#region VISTA
+//CREATE VIEW V_GRUPO_EMPLEADOS
+//AS
+//	SELECT CAST(
+//	ROW_NUMBER() OVER(ORDER BY EMP_NO) AS INT) AS POSICION,
+//    ISNULL(EMP_NO, 0) AS EMP_NO, APELLIDO, OFICIO, DIR, FECHA_ALT
+//    , SALARIO, COMISION, DEPT_NO FROM EMP
+//GO
+#endregion
 namespace MvcCorePaginacionRegistros.Models
 {
     [Table("EMP")]
