@@ -2,10 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MvcCorePaginacionRegistros.Data;
 using MvcCorePaginacionRegistros.Models;
-using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics.Metrics;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace MvcCorePaginacionRegistros.Repositories
 {
