@@ -21,6 +21,7 @@ namespace MvcCorePaginacionRegistros.Repositories
         //    WHERE POSICION>= @POSICION AND POSICION<(@POSICION+5)
         //    ORDER BY APELLIDO
         //GO
+            
         //CREATE PROCEDURE SP_GRUPO_EMPLEADOS_OFICIO
         //(@OFICIO NVARCHAR(20), @POSICION INT)
         //AS
@@ -59,9 +60,9 @@ namespace MvcCorePaginacionRegistros.Repositories
         //         WHERE QUERY.POSICION>=@POSICION AND QUERY.POSICION<(@POSICION+3)
         //        ) AS QUERY
         //   ORDER BY APELLIDO
-        //   --SET @NUMREGISTROS = @@ROWCOUNT
         //GO
         //EXEC SP_GRUPO_EMPLEADOS_OFICIO_NUMREGISTROS 'VENDEDOR', 1
+            
         //CREATE PROCEDURE SP_GRUPO_EMPLEADOS_OFICIO_RANGO
         //(@POSICION INT, @OFICIO NVARCHAR(20), @NUMREGISTROS INT OUT, @RANGO INT)
         //        AS
