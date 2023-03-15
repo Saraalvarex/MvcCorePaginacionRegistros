@@ -37,30 +37,7 @@ namespace MvcCorePaginacionRegistros.Repositories
         //    AS QUERY
         // ORDER BY APELLIDO
         //GO
-        //ALTER PROCEDURE SP_GRUPO_EMPLEADOS_OFICIO
-        //(
-        //  @OFICIO NVARCHAR(20), 
-        //  @POSICION INT,
-        //  @NUMREGISTROS INT OUTPUT
-        //)
-        //AS
-        //BEGIN
-        //   SELECT EMP_NO, APELLIDO, OFICIO, DIR, FECHA_ALT, SALARIO, COMISION, DEPT_NO
-        //   FROM(
-        //         SELECT* FROM
-        //         (
-        //           SELECT CAST(
-        //                  ROW_NUMBER() OVER (ORDER BY APELLIDO) AS INT) AS POSICION,
-        //                  EMP_NO, APELLIDO, OFICIO, DIR, FECHA_ALT, SALARIO, COMISION, DEPT_NO
-        //           FROM EMP
-        //           WHERE OFICIO = @OFICIO
-        //         ) AS QUERY
-        //         WHERE QUERY.POSICION>=@POSICION AND QUERY.POSICION<(@POSICION+3)
-        //        ) AS QUERY
-        //   ORDER BY APELLIDO
-        //   SET @NUMREGISTROS = @@ROWCOUNT
-        //END
-        //GO
+        
         //ALTER PROCEDURE SP_GRUPO_EMPLEADOS_OFICIO_NUMREGISTROS
         //(
         //  @POSICION INT,
