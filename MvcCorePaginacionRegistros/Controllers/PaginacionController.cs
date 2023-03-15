@@ -19,7 +19,7 @@ namespace MvcCorePaginacionRegistros.Controllers
 
         //[Route("PaginarGrupoEmpleadosOficio")]
         //[ActionName("PaginarGrupoEmpleadosOficio")]
-        public async Task<IActionResult> PaginarGrupoEmpleadosOficio(int? posicion, string oficio)
+        public async Task<IActionResult> PaginarGrupoEmpleadosOficio(int? posicion, string oficio, int rango)
         {
             if (posicion == null)
             {
@@ -27,24 +27,33 @@ namespace MvcCorePaginacionRegistros.Controllers
                 return View();
             } else
             {
-                int numRegistros = this.repo.GetNumRegistrosEmpleadosOficio(oficio);
-                ViewBag.REGISTROS = numRegistros;
+                //int numRegistros = this.repo.GetNumRegistrosEmpleadosOficio(oficio);
+                //ViewBag.REGISTROS = numRegistros;
                 ViewBag.OFICIO = oficio;
-                List<Empleado> empleados = await this.repo.GetGrupoEmpleadosOficioAsync(posicion.Value, oficio);
+                //List<Empleado> empleados = await this.repo.GetGrupoEmpleadosOficioAsync(posicion.Value, oficio);
+                PaginarEmpleados model = await this.repo.GetGrupoEmpleadosOficioAsync(posicion.Value, oficio, rango);
+                List<Empleado> empleados = model.Empleados;
+                int numRegistros = model.NumRegistros;
+                ViewBag.REGISTROS = numRegistros;
+                ViewBag.RANGO = (int)model.Rango;
                 return View(empleados);
             }
         }
 
         [HttpPost]
         //[ActionName("controllername/PaginarGrupoEmpleadosOficio")]
-        //BUSCAR
-        public async Task<IActionResult> PaginarGrupoEmpleadosOficio(string? oficio)
+        //BUSCAR EMPLEADOS POR OFICIO
+        public async Task<IActionResult> PaginarGrupoEmpleadosOficio(string? oficio, int? rango)
         {
             int posicion = 1;
-            int numRegistros = this.repo.GetNumRegistrosEmpleadosOficio(oficio);
-            ViewBag.REGISTROS = numRegistros;
+            //int numRegistros = this.repo.GetNumRegistrosEmpleadosOficio(oficio);
             ViewBag.OFICIO = oficio;
-            List<Empleado> empleados = await this.repo.GetGrupoEmpleadosOficioAsync(posicion, oficio);
+            //List<Empleado> empleados = await this.repo.GetGrupoEmpleadosOficioAsync(posicion, oficio);
+            PaginarEmpleados model = await this.repo.GetGrupoEmpleadosOficioAsync(posicion, oficio, rango.Value);
+            List<Empleado> empleados = model.Empleados;
+            int numRegistros = model.NumRegistros;
+            ViewBag.REGISTROS = numRegistros;
+            ViewBag.RANGO = (int)model.Rango;
             return View(empleados);
         }
         public async Task<IActionResult> PaginarGrupoEmpleados(int? posicion)

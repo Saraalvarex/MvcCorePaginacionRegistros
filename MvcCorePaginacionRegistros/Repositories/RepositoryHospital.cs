@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MvcCorePaginacionRegistros.Data;
 using MvcCorePaginacionRegistros.Models;
+using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics.Metrics;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
@@ -24,7 +25,7 @@ namespace MvcCorePaginacionRegistros.Repositories
         //(@OFICIO NVARCHAR(20), @POSICION INT)
         //AS
         // SELECT EMP_NO, APELLIDO, OFICIO, DIR, FECHA_ALT
-        // , SALARIO, COMISION, DEPT_NO
+        // , SALARIO, COMISION, DEPT_NO
         // FROM(SELECT* FROM
         // (SELECT CAST(
         // ROW_NUMBER() OVER (ORDER BY APELLIDO) AS INT) AS POSICION,
@@ -33,7 +34,7 @@ namespace MvcCorePaginacionRegistros.Repositories
         // FROM EMP
         // WHERE OFICIO = @OFICIO) AS QUERY
         // WHERE QUERY.POSICION>=@POSICION AND QUERY.POSICION<(@POSICION+3))
-        //    AS QUERY
+        //    AS QUERY
         // ORDER BY APELLIDO
         //GO
         //ALTER PROCEDURE SP_GRUPO_EMPLEADOS_OFICIO
@@ -60,7 +61,48 @@ namespace MvcCorePaginacionRegistros.Repositories
         //   SET @NUMREGISTROS = @@ROWCOUNT
         //END
         //GO
-        //EXEC SP_GRUPO_EMPLEADOS_OFICIO 'VENDEDOR', 2, 3
+        //ALTER PROCEDURE SP_GRUPO_EMPLEADOS_OFICIO_NUMREGISTROS
+        //(
+        //  @POSICION INT,
+        //  @OFICIO NVARCHAR(20), 
+        //  @NUMREGISTROS INT OUT
+        //)
+        //AS
+        //SELECT @NUMREGISTROS = COUNT(EMP_NO) FROM EMP WHERE OFICIO = @OFICIO
+        //   SELECT EMP_NO, APELLIDO, OFICIO, DIR, FECHA_ALT, SALARIO, COMISION, DEPT_NO
+        //   FROM(
+        //         SELECT* FROM
+        //         (
+        //           SELECT CAST(
+        //                  ROW_NUMBER() OVER (ORDER BY APELLIDO) AS INT) AS POSICION,
+        //                  EMP_NO, APELLIDO, OFICIO, DIR, FECHA_ALT, SALARIO, COMISION, DEPT_NO
+        //           FROM EMP
+        //           WHERE OFICIO = @OFICIO
+        //         ) AS QUERY
+        //         WHERE QUERY.POSICION>=@POSICION AND QUERY.POSICION<(@POSICION+3)
+        //        ) AS QUERY
+        //   ORDER BY APELLIDO
+        //   --SET @NUMREGISTROS = @@ROWCOUNT
+        //GO
+        //EXEC SP_GRUPO_EMPLEADOS_OFICIO_NUMREGISTROS 'VENDEDOR', 1
+        //CREATE PROCEDURE SP_GRUPO_EMPLEADOS_OFICIO_RANGO
+        //(@POSICION INT, @OFICIO NVARCHAR(20), @NUMREGISTROS INT OUT, @RANGO INT)
+        //        AS
+        //        SELECT @NUMREGISTROS = COUNT(EMP_NO) FROM EMP WHERE OFICIO = @OFICIO
+        //           SELECT EMP_NO, APELLIDO, OFICIO, DIR, FECHA_ALT, SALARIO, COMISION, DEPT_NO
+        //           FROM(
+        //                 SELECT* FROM
+        //                 (
+        //                   SELECT CAST(
+        //                          ROW_NUMBER() OVER (ORDER BY APELLIDO) AS INT) AS POSICION,
+        //                          EMP_NO, APELLIDO, OFICIO, DIR, FECHA_ALT, SALARIO, COMISION, DEPT_NO
+        //                   FROM EMP
+        //                   WHERE OFICIO = @OFICIO
+        //                 ) AS QUERY
+        //                 WHERE QUERY.POSICION>=@POSICION AND QUERY.POSICION<(@POSICION + @RANGO)
+        //                ) AS QUERY
+        //           ORDER BY APELLIDO
+        //           GO
         #endregion
         private HospitalContext context;
         public RepositoryHospital(HospitalContext context)
@@ -83,13 +125,25 @@ namespace MvcCorePaginacionRegistros.Repositories
             return consulta.Count();
         }
         
-        public async Task<List<Empleado>> GetGrupoEmpleadosOficioAsync(int posicion, string oficio)
+        public async Task<PaginarEmpleados> GetGrupoEmpleadosOficioAsync(int posicion, string oficio, int rango)
         {
-            string sql = "SP_GRUPO_EMPLEADOS_OFICIO @POSICION, @OFICIO";
+            string sql = "SP_GRUPO_EMPLEADOS_OFICIO_RANGO @POSICION, @OFICIO, @NUMREGISTROS OUT, @RANGO";
+            //string sql = "SP_GRUPO_EMPLEADOS_OFICIO_NUMREGISTROS @POSICION, @OFICIO, @NUMREGISTROS OUT";
+            //string sql = "SP_GRUPO_EMPLEADOS_OFICIO @POSICION, @OFICIO";
             SqlParameter pamposicion = new SqlParameter("@POSICION", posicion);
             SqlParameter pamoficio = new SqlParameter("@OFICIO", oficio);
-            var consulta = this.context.Empleados.FromSqlRaw(sql, pamposicion, pamoficio);
-            return await consulta.ToListAsync();
+            SqlParameter pamnumregistros = new SqlParameter("@NUMREGISTROS", -1);
+            SqlParameter pamrango = new SqlParameter("@RANGO", rango);
+            pamnumregistros.Direction = ParameterDirection.Output;
+            var consulta = this.context.Empleados.FromSqlRaw(sql, pamposicion, pamoficio, pamnumregistros, pamrango);
+            List<Empleado> empleados = await consulta.ToListAsync();
+            int numregistros = (int)pamnumregistros.Value;
+            return new PaginarEmpleados
+            {
+                NumRegistros = numregistros,
+                Rango = rango,
+                Empleados=empleados
+            };
         }
 
         public async Task<List<Empleado>> GetGrupoEmpleadosAsync(int posicion)

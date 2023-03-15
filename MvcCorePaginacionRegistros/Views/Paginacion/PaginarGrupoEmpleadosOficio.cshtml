@@ -4,12 +4,14 @@
 }
 @{
     int numeroregistros = 0;
+    int rango = 0;
     string oficio = "";
     int numeropagina = 1;
     if (ViewBag.REGISTROS != null)
     {
         numeroregistros = (int)ViewBag.REGISTROS;
         oficio = ViewBag.OFICIO.ToString();
+        rango = ViewBag.RANGO;
     }
 }
 @*FILTRO DE BÚSQUEDA POR OFICIO*@
@@ -17,8 +19,9 @@
     <form method="post">
         <div class="form-group">
             <input type="text" name="oficio" required/>
+            <input type="number" name="rango" required/>
         </div>
-        <br/>
+        <br />
         <button class="btn btn-primary">Buscar</button>
     </form>
 </div>
@@ -26,13 +29,14 @@
 
 @if (Model!=null){
 <ul class="list-group list-group-horizontal">
-    @for (int i = 1; i <= numeroregistros; i += 3)
+    @for (int i = 1; i <= numeroregistros; i += rango)
     {
         <li class="list-group-item list-group-item-primary">
             <a asp-action="PaginarGrupoEmpleadosOficio"
                asp-controller="Paginacion"
                asp-route-posicion="@i"
-                asp-route-oficio="@oficio">
+               asp-route-rango="@rango"
+               asp-route-oficio="@oficio">
                Pag @numeropagina
             </a>
         </li>
