@@ -16,19 +16,35 @@ namespace MvcCorePaginacionRegistros.Controllers
         {
             return View();
         }
-        public async Task<IActionResult> PaginarGrupoEmpleadosOficio()
-        {
-            return View();
-        }
 
-        [HttpPost]
-        public async Task<IActionResult> PaginarGrupoEmpleadosOficio(string oficio, int? posicion)
+        //[Route("PaginarGrupoEmpleadosOficio")]
+        //[ActionName("PaginarGrupoEmpleadosOficio")]
+        public async Task<IActionResult> PaginarGrupoEmpleadosOficio(int? posicion, string oficio)
         {
             if (posicion == null)
             {
                 posicion = 1;
+                return View();
+            } else
+            {
+                int numRegistros = this.repo.GetNumRegistrosEmpleadosOficio(oficio);
+                ViewBag.REGISTROS = numRegistros;
+                ViewBag.OFICIO = oficio;
+                List<Empleado> empleados = await this.repo.GetGrupoEmpleadosOficioAsync(posicion.Value, oficio);
+                return View(empleados);
             }
-            List<Empleado> empleados = await this.repo.GetEmpleadosOficio(oficio, posicion.Value);
+        }
+
+        [HttpPost]
+        //[ActionName("controllername/PaginarGrupoEmpleadosOficio")]
+        //BUSCAR
+        public async Task<IActionResult> PaginarGrupoEmpleadosOficio(string? oficio)
+        {
+            int posicion = 1;
+            int numRegistros = this.repo.GetNumRegistrosEmpleadosOficio(oficio);
+            ViewBag.REGISTROS = numRegistros;
+            ViewBag.OFICIO = oficio;
+            List<Empleado> empleados = await this.repo.GetGrupoEmpleadosOficioAsync(posicion, oficio);
             return View(empleados);
         }
         public async Task<IActionResult> PaginarGrupoEmpleados(int? posicion)

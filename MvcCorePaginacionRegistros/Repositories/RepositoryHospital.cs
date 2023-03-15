@@ -67,17 +67,6 @@ namespace MvcCorePaginacionRegistros.Repositories
         {
             this.context = context;
         }
-        public async Task<List<Empleado>> GetEmpleadosOficio(string oficio, int posicion)
-        {
-            string sql = "SP_GRUPO_EMPLEADOS_OFICIO @OFICIO @POSICION @NUMREGISTROS OUT";
-            SqlParameter pamoficio = new SqlParameter("@OFICIO", oficio);
-            SqlParameter pamposicion = new SqlParameter("@POSICION", posicion);
-            SqlParameter pamnumregistros = new SqlParameter("@NUMREGISTROS", SqlDbType.Int);
-            pamnumregistros.Direction = ParameterDirection.Output;
-            int numRegistros = (int)pamnumregistros.Value;
-            var consulta = this.context.Empleados.FromSqlRaw(sql, pamoficio, pamposicion, pamnumregistros);
-            return await consulta.ToListAsync();
-        }
         public int GetNumeroRegistrosVistaDepartamentos()
         {
             return this.context.VistaDepartamentos.Count();
@@ -85,6 +74,22 @@ namespace MvcCorePaginacionRegistros.Repositories
         public int GetNumeroRegistrosEmpleados()
         {
             return this.context.Empleados.Count();
+        }
+        public int GetNumRegistrosEmpleadosOficio(string oficio)
+        {
+            var consulta = from datos in this.context.Empleados
+                           where datos.Oficio==oficio
+                           select datos;
+            return consulta.Count();
+        }
+        
+        public async Task<List<Empleado>> GetGrupoEmpleadosOficioAsync(int posicion, string oficio)
+        {
+            string sql = "SP_GRUPO_EMPLEADOS_OFICIO @POSICION, @OFICIO";
+            SqlParameter pamposicion = new SqlParameter("@POSICION", posicion);
+            SqlParameter pamoficio = new SqlParameter("@OFICIO", oficio);
+            var consulta = this.context.Empleados.FromSqlRaw(sql, pamposicion, pamoficio);
+            return await consulta.ToListAsync();
         }
 
         public async Task<List<Empleado>> GetGrupoEmpleadosAsync(int posicion)
